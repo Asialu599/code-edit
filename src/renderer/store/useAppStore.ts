@@ -9,8 +9,14 @@ import {
 
 const OPEN_PROJECTS_STORAGE_KEY = 'code-edit.openProjects'
 const THEME_STORAGE_KEY = 'code-edit.theme'
+const TERMINAL_PROXY_STORAGE_KEY = 'code-edit.terminalProxy'
 
 export type AppTheme = 'dark' | 'light'
+
+export interface TerminalProxyState {
+  enabled: boolean
+  address: string
+}
 
 const IMAGE_EXTENSIONS = new Set([
   '.png', '.jpg', '.jpeg', '.gif', '.bmp', '.webp', '.svg', '.ico', '.avif',
@@ -42,6 +48,26 @@ function readOpenProjectPaths(): string[] {
   } catch {
     return []
   }
+}
+
+function readTerminalProxyState(): TerminalProxyState {
+  try {
+    const raw = localStorage.getItem(TERMINAL_PROXY_STORAGE_KEY)
+    if (!raw) return { enabled: false, address: '' }
+    const parsed = JSON.parse(raw)
+    if (!parsed || typeof parsed !== 'object') return { enabled: false, address: '' }
+
+    return {
+      enabled: Boolean(parsed.enabled),
+      address: typeof parsed.address === 'string' ? parsed.address : '',
+    }
+  } catch {
+    return { enabled: false, address: '' }
+  }
+}
+
+function saveTerminalProxyState(proxy: TerminalProxyState): void {
+  localStorage.setItem(TERMINAL_PROXY_STORAGE_KEY, JSON.stringify(proxy))
 }
 
 function getFileExtension(filePath: string): string {
@@ -86,6 +112,10 @@ interface AppState {
   addTerminal: (info: TerminalInfo) => void
   removeTerminal: (id: string) => void
   setActiveTerminal: (id: string) => void
+  terminalProxy: TerminalProxyState
+  setTerminalProxyAddress: (address: string) => void
+  enableTerminalProxy: () => Promise<void>
+  disableTerminalProxy: () => Promise<void>
 
   // UI
   theme: AppTheme
@@ -280,6 +310,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   // ===== 终端 =====
   terminals: [],
   activeTerminalId: null,
+  terminalProxy: readTerminalProxyState(),
 
   addTerminal: (info: TerminalInfo) => {
     set((s) => ({
@@ -304,6 +335,28 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   setActiveTerminal: (id: string) => {
     set({ activeTerminalId: id, bottomPanelVisible: true })
+  },
+
+  setTerminalProxyAddress: (address: string) => {
+    set((s) => {
+      const terminalProxy = { ...s.terminalProxy, address }
+      saveTerminalProxyState(terminalProxy)
+      return { terminalProxy }
+    })
+  },
+
+  enableTerminalProxy: async () => {
+    const address = get().terminalProxy.address.trim()
+    const terminalProxy = await window.electronAPI.setTerminalProxy(true, address)
+    saveTerminalProxyState(terminalProxy)
+    set({ terminalProxy })
+  },
+
+  disableTerminalProxy: async () => {
+    const terminalProxy = { ...get().terminalProxy, enabled: false }
+    const nextProxy = await window.electronAPI.setTerminalProxy(false, terminalProxy.address)
+    saveTerminalProxyState(nextProxy)
+    set({ terminalProxy: nextProxy })
   },
 
   // ===== UI =====

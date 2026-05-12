@@ -11,6 +11,9 @@ export default function App() {
   // 启动时恢复上次打开的项目文件夹
   useEffect(() => {
     useAppStore.getState().restoreProjects()
+
+    const { terminalProxy } = useAppStore.getState()
+    window.electronAPI.setTerminalProxy(terminalProxy.enabled, terminalProxy.address)
   }, [])
 
   // 监听文件系统变更

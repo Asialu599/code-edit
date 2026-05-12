@@ -1,4 +1,5 @@
 import { useAppStore } from '../../store/useAppStore'
+import logoUrl from '../../assets/logo.svg'
 
 export default function WelcomeScreen() {
   const addProject = useAppStore((s) => s.addProject)
@@ -13,7 +14,7 @@ export default function WelcomeScreen() {
   return (
     <div className="welcome-screen">
       <div className="welcome-content">
-        <div className="welcome-mark">CE</div>
+        <img className="welcome-logo" src={logoUrl} alt="CodeEdit" />
         <h1 className="welcome-title">CodeEdit</h1>
         <p className="welcome-subtitle">轻量、多项目、内置终端的桌面代码工作台</p>
         <div className="welcome-actions">

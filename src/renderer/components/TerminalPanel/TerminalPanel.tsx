@@ -8,9 +8,20 @@ export default function TerminalPanel() {
   const removeTerminal = useAppStore((s) => s.removeTerminal)
   const projects = useAppStore((s) => s.projects)
   const bottomPanelHeight = useAppStore((s) => s.bottomPanelHeight)
+  const terminalProxy = useAppStore((s) => s.terminalProxy)
+  const setTerminalProxyAddress = useAppStore((s) => s.setTerminalProxyAddress)
+  const enableTerminalProxy = useAppStore((s) => s.enableTerminalProxy)
+  const disableTerminalProxy = useAppStore((s) => s.disableTerminalProxy)
   const paneCount = Math.max(terminals.length, 1)
   const gridColumns = terminals.length >= 5 ? Math.ceil(paneCount / 2) : paneCount
   const gridRows = terminals.length >= 5 ? 2 : 1
+
+  const validateProxyAddress = (address: string): boolean => {
+    const match = address.trim().match(/^([a-zA-Z0-9.-]+):(\d{1,5})$/)
+    if (!match) return false
+    const port = Number(match[2])
+    return port > 0 && port <= 65535
+  }
 
   const handleNewTerminal = async () => {
     try {
@@ -31,6 +42,27 @@ export default function TerminalPanel() {
   const handleCloseTerminal = (id: string) => {
     window.electronAPI.killTerminal(id)
     removeTerminal(id)
+  }
+
+  const handleEnableProxy = async () => {
+    if (!validateProxyAddress(terminalProxy.address)) {
+      alert('代理格式不正确，请输入类似 127.0.0.1:6922 的地址')
+      return
+    }
+
+    try {
+      await enableTerminalProxy()
+    } catch (err: any) {
+      alert('启用代理失败: ' + (err.message || err))
+    }
+  }
+
+  const handleDisableProxy = async () => {
+    try {
+      await disableTerminalProxy()
+    } catch (err: any) {
+      alert('停用代理失败: ' + (err.message || err))
+    }
   }
 
   return (
@@ -57,6 +89,24 @@ export default function TerminalPanel() {
           ))}
         </div>
         <div className="terminal-toolbar-actions">
+          <div className={`terminal-proxy-control ${terminalProxy.enabled ? 'enabled' : ''}`}>
+            <input
+              className="terminal-proxy-input"
+              value={terminalProxy.address}
+              onChange={(e) => setTerminalProxyAddress(e.target.value)}
+              placeholder="127.0.0.1:6922"
+              title="代理地址，格式如 127.0.0.1:6922"
+            />
+            {terminalProxy.enabled ? (
+              <button className="terminal-action-btn proxy-toggle active" onClick={handleDisableProxy}>
+                停用代理
+              </button>
+            ) : (
+              <button className="terminal-action-btn proxy-toggle" onClick={handleEnableProxy}>
+                启用代理
+              </button>
+            )}
+          </div>
           {terminals.length === 0 && (
             <button className="terminal-action-btn" onClick={handleNewTerminal}>
               + 新建终端

@@ -86,17 +86,14 @@ export function createMenu(getWindow: () => BrowserWindow | null): Menu {
         { type: 'separator' },
         {
           label: '剪切',
-          accelerator: 'CmdOrCtrl+X',
           role: 'cut',
         },
         {
           label: '复制',
-          accelerator: 'CmdOrCtrl+C',
           role: 'copy',
         },
         {
           label: '粘贴',
-          accelerator: 'CmdOrCtrl+V',
           role: 'paste',
         },
         { type: 'separator' },

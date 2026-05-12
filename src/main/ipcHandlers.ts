@@ -82,6 +82,10 @@ export function registerIpcHandlers(): void {
     terminalManager.kill(id)
   })
 
+  ipcMain.handle(IPC.TERMINAL_SET_PROXY, (_e, enabled: boolean, address: string) => {
+    return terminalManager.setProxy({ enabled, address })
+  })
+
   // ===== 窗口 =====
 
   ipcMain.handle(IPC.WINDOW_SET_TITLE, (_e, title: string) => {

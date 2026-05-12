@@ -45,6 +45,11 @@ export interface TerminalInfo {
   title: string
 }
 
+export interface TerminalProxyConfig {
+  enabled: boolean
+  address: string
+}
+
 // ===== IPC 通道 =====
 export const IPC = {
   // 文件系统
@@ -62,6 +67,7 @@ export const IPC = {
   TERMINAL_WRITE: 'terminal:write',
   TERMINAL_RESIZE: 'terminal:resize',
   TERMINAL_KILL: 'terminal:kill',
+  TERMINAL_SET_PROXY: 'terminal:setProxy',
   TERMINAL_DATA: 'terminal:data',
   TERMINAL_EXIT: 'terminal:exit',
 

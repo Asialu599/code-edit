@@ -4,6 +4,12 @@ import { APP_NAME, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, MIN_WINDOW_WIDTH
 
 let mainWindow: BrowserWindow | null = null
 
+function getAppIconPath(): string {
+  return app.isPackaged
+    ? join(process.resourcesPath, 'icon.ico')
+    : join(process.cwd(), 'resources', 'icon.ico')
+}
+
 export function createMainWindow(): BrowserWindow {
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.focus()
@@ -16,6 +22,7 @@ export function createMainWindow(): BrowserWindow {
     height: DEFAULT_WINDOW_HEIGHT,
     minWidth: MIN_WINDOW_WIDTH,
     minHeight: MIN_WINDOW_HEIGHT,
+    icon: getAppIconPath(),
     backgroundColor: '#1e1e1e',
     titleBarStyle: 'default',
     webPreferences: {

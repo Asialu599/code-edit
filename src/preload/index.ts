@@ -1,5 +1,5 @@
-import { contextBridge, ipcRenderer } from 'electron'
-import { IPC, FileNode, FileSearchResult } from '../shared/types'
+import { clipboard, contextBridge, ipcRenderer } from 'electron'
+import { IPC, FileNode, FileSearchResult, TerminalProxyConfig } from '../shared/types'
 
 type DirChangeCallback = (event: string, filePath: string) => void
 type TerminalDataCallback = (data: { id: string; data: string }) => void
@@ -53,6 +53,16 @@ const api = {
 
   killTerminal: (id: string): Promise<void> =>
     ipcRenderer.invoke(IPC.TERMINAL_KILL, id),
+
+  setTerminalProxy: (enabled: boolean, address: string): Promise<TerminalProxyConfig> =>
+    ipcRenderer.invoke(IPC.TERMINAL_SET_PROXY, enabled, address),
+
+  readClipboardText: (): string =>
+    clipboard.readText(),
+
+  writeClipboardText: (text: string): void => {
+    clipboard.writeText(text)
+  },
 
   onTerminalData: (cb: TerminalDataCallback): DirChangeCleanup => {
     const handler = (_e: Electron.IpcRendererEvent, data: { id: string; data: string }) => cb(data)
