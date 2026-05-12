@@ -1185,18 +1185,87 @@ button {
   overflow: hidden;
 }
 
-.terminal-grid {
-  display: grid;
+.terminal-layout {
+  display: flex;
   min-width: 0;
-  overflow-x: auto;
-  overflow-y: auto;
+  min-height: 0;
+  overflow: hidden;
   background: var(--terminal-bg, #0d1116);
 }
 
+.terminal-split {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.terminal-split-row {
+  flex-direction: row;
+}
+
+.terminal-split-column {
+  flex-direction: column;
+}
+
+.terminal-split-child {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.terminal-splitter {
+  flex: 0 0 5px;
+  position: relative;
+  background: var(--border-color);
+  opacity: 0.82;
+  z-index: 2;
+}
+
+.terminal-splitter::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  transition: background 0.12s;
+}
+
+.terminal-splitter-row {
+  cursor: col-resize;
+}
+
+.terminal-splitter-row::before {
+  left: -3px;
+  right: -3px;
+}
+
+.terminal-splitter-column {
+  cursor: row-resize;
+}
+
+.terminal-splitter-column::before {
+  top: -3px;
+  bottom: -3px;
+}
+
+.terminal-splitter:hover::before,
+.is-resizing-terminal-pane .terminal-splitter::before {
+  background: var(--accent-color);
+}
+
+.is-resizing-terminal-pane {
+  user-select: none;
+}
+
 .terminal-pane {
+  position: relative;
   display: flex;
   flex-direction: column;
-  min-width: 260px;
+  width: 100%;
+  height: 100%;
+  min-width: 140px;
   min-height: 0;
   border-right: 1px solid var(--border-color);
   border-bottom: 1px solid var(--border-color);
@@ -1218,6 +1287,48 @@ button {
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   color: var(--fg-secondary);
   font-size: 11px;
+}
+
+.terminal-pane-local-tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.terminal-pane-local-tabs::-webkit-scrollbar {
+  height: 2px;
+}
+
+.terminal-pane-local-tab {
+  max-width: 180px;
+  min-width: 54px;
+  height: 20px;
+  padding: 0 7px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--fg-secondary);
+  cursor: grab;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+.terminal-pane-local-tab:active {
+  cursor: grabbing;
+}
+
+.terminal-pane-local-tab.active {
+  background: var(--bg-primary);
+  border-color: var(--border-strong);
+  color: var(--fg-bright);
 }
 
 .terminal-pane-index {
@@ -1262,9 +1373,22 @@ button {
 }
 
 .terminal-pane-body {
+  position: relative;
   flex: 1;
   min-height: 0;
   overflow: hidden;
+}
+
+.terminal-instance {
+  position: absolute;
+  inset: 0;
+  display: none;
+  min-width: 0;
+  min-height: 0;
+}
+
+.terminal-instance.active {
+  display: block;
 }
 
 .xterm-container {
@@ -1272,6 +1396,56 @@ button {
   height: 100%;
   padding: 8px 8px 14px;
   background: var(--terminal-bg, #0d1116);
+}
+
+.terminal-pane.drop-left::after,
+.terminal-pane.drop-right::after,
+.terminal-pane.drop-top::after,
+.terminal-pane.drop-bottom::after,
+.terminal-pane.drop-center::after {
+  content: "";
+  position: absolute;
+  z-index: 4;
+  pointer-events: none;
+  border: 2px solid var(--accent-color);
+  background: rgba(79, 179, 255, 0.16);
+}
+
+.terminal-pane.drop-left::after {
+  inset: 0 72% 0 0;
+}
+
+.terminal-pane.drop-right::after {
+  inset: 0 0 0 72%;
+}
+
+.terminal-pane.drop-top::after {
+  inset: 0 0 72% 0;
+}
+
+.terminal-pane.drop-bottom::after {
+  inset: 72% 0 0 0;
+}
+
+.terminal-pane.drop-center::after {
+  inset: 18%;
+  border-radius: 8px;
+}
+
+.terminal-drop-label {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 5;
+  transform: translate(-50%, -50%);
+  padding: 4px 9px;
+  border: 1px solid rgba(79, 179, 255, 0.55);
+  border-radius: 6px;
+  background: var(--bg-raised);
+  color: var(--fg-bright);
+  font-size: 11px;
+  box-shadow: var(--shadow-soft);
+  pointer-events: none;
 }
 
 .terminal-empty {
