@@ -122,7 +122,6 @@ export default function TerminalPanel() {
       <div
         className="terminal-container terminal-grid"
         style={{
-          height: bottomPanelHeight - 35,
           gridTemplateColumns: `repeat(${gridColumns}, minmax(260px, 1fr))`,
           gridTemplateRows: `repeat(${gridRows}, minmax(140px, 1fr))`,
         }}

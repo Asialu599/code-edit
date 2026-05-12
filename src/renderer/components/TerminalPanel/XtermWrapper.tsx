@@ -211,7 +211,11 @@ export default function XtermWrapper({ terminalId }: Props) {
         const fitAndResize = () => {
           try {
             fitAddon.fit()
-            window.electronAPI.resizeTerminal(terminalId, term.cols, term.rows)
+            const visibleRows = Math.max(1, term.rows - 1)
+            if (visibleRows !== term.rows) {
+              term.resize(term.cols, visibleRows)
+            }
+            window.electronAPI.resizeTerminal(terminalId, term.cols, visibleRows)
           } catch {}
         }
 
