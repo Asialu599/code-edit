@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "outDir": "./out/preload"
+  },
+  "include": ["src/preload/**/*.ts", "src/shared/**/*.ts"]
+}

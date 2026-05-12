@@ -1,0 +1,10 @@
+export const APP_NAME = 'CodeEdit'
+export const DEFAULT_WINDOW_WIDTH = 1200
+export const DEFAULT_WINDOW_HEIGHT = 800
+export const MIN_WINDOW_WIDTH = 600
+export const MIN_WINDOW_HEIGHT = 400
+export const SIDEBAR_MIN_WIDTH = 180
+export const SIDEBAR_DEFAULT_WIDTH = 260
+export const BOTTOM_PANEL_MIN_HEIGHT = 80
+export const BOTTOM_PANEL_DEFAULT_HEIGHT = 200
+export const FILE_TREE_LAZY_DEPTH = 2
