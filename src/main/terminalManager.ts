@@ -4,6 +4,30 @@ import { IPC, TerminalProxyConfig } from '../shared/types'
 import { execFileSync } from 'child_process'
 import net from 'net'
 
+// ---- Windows 注册表工具：读取 REG_SZ / REG_EXPAND_SZ 值 ----
+function readRegString(key: string, valueName: string): string {
+  try {
+    const output = execFileSync('reg', ['query', key, '/v', valueName], {
+      encoding: 'utf8',
+      windowsHide: true,
+    })
+    const match = output.match(new RegExp(`${valueName}\\s+REG_(?:SZ|EXPAND_SZ)\\s+(.+)`, 'i'))
+    return (match?.[1] || '').trim()
+  } catch {
+    return ''
+  }
+}
+
+// ---- 每次创建终端时从注册表获取最新 PATH（解决 Electron 环境快照过期问题） ----
+function getWindowsCurrentPath(): string {
+  if (process.platform !== 'win32') return process.env.PATH || ''
+
+  const systemPath = readRegString('HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment', 'Path')
+  const userPath = readRegString('HKCU\\Environment', 'Path')
+  const merged = [systemPath, userPath].filter(Boolean).join(';')
+  return merged || process.env.PATH || ''
+}
+
 interface TerminalProcess {
   id: string
   ptyProcess: pty.IPty
@@ -96,6 +120,14 @@ class TerminalManager {
     const env = {
       ...(process.env as Record<string, string>),
       TERM: 'xterm-256color',
+    }
+
+    // Windows：每次创建终端时从注册表刷新 PATH，确保 deepseek/codex 等新安装的命令立即可用
+    if (process.platform === 'win32') {
+      const currentPath = getWindowsCurrentPath()
+      if (currentPath) {
+        env.Path = currentPath
+      }
     }
 
     if (this.proxyConfig.enabled) {
